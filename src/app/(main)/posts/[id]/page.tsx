@@ -8,6 +8,10 @@ import { useSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Download, Heart, Loader, Loader2, UserCircle2 } from 'lucide-react';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 // UTILS
 import { calculateTimeDifference } from '@/utils/datetime-relative';
@@ -183,9 +187,9 @@ const PostDetailsPage: NextPage<PostDetailsProps> = ({ params: { id } }) => {
 					<div className="flex items-center gap-2">
 						<Link
 							className="
-										bg-gray-900 text-white w-9 h-9 p-2 rounded-full flex items-center
-										justify-center text-dark text-xl opacity-75 hover:opacity-100
-										hover:shadow-md outline-none hover:text-emerald-500"
+								bg-gray-900 text-white w-9 h-9 p-2 rounded-full flex items-center
+								justify-center text-dark text-xl opacity-75 hover:opacity-100
+								hover:shadow-md outline-none hover:text-emerald-500"
 							href={postImgSrc}
 							target="_blank"
 							download
@@ -216,7 +220,9 @@ const PostDetailsPage: NextPage<PostDetailsProps> = ({ params: { id } }) => {
 					<span className="text-sm text-gray-500">
 						{calculateTimeDifference(
 							new Date().getTime(),
-							new Date(post.createdAt).getTime(),
+							new Date(
+								dayjs(post.createdAt).add(-3, 'hours').format(),
+							).getTime(),
 						)}
 					</span>
 				</div>
@@ -263,7 +269,9 @@ const PostDetailsPage: NextPage<PostDetailsProps> = ({ params: { id } }) => {
 										{calculateTimeDifference(
 											new Date().getTime(),
 											new Date(
-												comment.createdAt,
+												dayjs(post.createdAt)
+													.add(-3, 'hours')
+													.format(),
 											).getTime(),
 										)}
 									</span>

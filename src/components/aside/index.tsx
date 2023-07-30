@@ -92,6 +92,10 @@ const Aside = memo(({ session }: AsideProps) => {
 				) : (
 					<>
 						{categories?.map((category) => {
+							const selectedCategory = params.get('category');
+							const isSelected =
+								!!selectedCategory &&
+								selectedCategory === category.name;
 							return (
 								<div
 									key={category.id}
@@ -100,7 +104,9 @@ const Aside = memo(({ session }: AsideProps) => {
 										e.stopPropagation();
 										handleSelectCategory(category.name);
 									}}
-									className="flex items-center font-semibold p-1 rounded-md uppercase text-xs hover:bg-slate-200 cursor-pointer"
+									className={`flex items-center font-semibold p-1 rounded-md uppercase text-xs hover:bg-slate-200 cursor-pointer ${
+										isSelected && 'bg-slate-200'
+									}`}
 								>
 									<span>{category.name}</span>
 								</div>
