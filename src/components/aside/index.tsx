@@ -1,22 +1,65 @@
 'use client';
 
-import { memo, MouseEvent } from 'react';
+import { memo, MouseEvent, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Session } from 'next-auth';
-import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { LogOut } from 'lucide-react';
+import qs from 'querystring';
+
+// SERVICES
+import { api } from '@/services/api';
+
+// INTERFACES
+import { CategoryInterface } from '@/interfaces/category.interface';
 
 // COMPONENTS
 import { Button } from '@/components/ui/button';
-import { signOut } from 'next-auth/react';
+import { CategorySkeleton } from './components/category-skeleton';
 
 interface AsideProps {
 	session?: Session | null;
 }
 
 const Aside = memo(({ session }: AsideProps) => {
+	const pathname = usePathname();
+	const params = useSearchParams();
 	const { push } = useRouter();
+
+	const { data: categories, isLoading } = useQuery({
+		queryKey: [`list-categories`],
+		queryFn: async () => {
+			return await api
+				.get<CategoryInterface[]>(`/categories`)
+				.then((res) => res.data);
+		},
+	});
+
+	const handleSelectCategory = useCallback(
+		(category: string) => {
+			let currentQuery: Record<string, any> = {};
+
+			if (params) {
+				currentQuery = qs.parse(params.toString());
+			}
+
+			const updatedQuery: any = {
+				...currentQuery,
+				category,
+			};
+
+			if (params?.get('category') === category) {
+				delete updatedQuery.category;
+			}
+
+			const searchParams = new URLSearchParams(updatedQuery);
+			push(`${pathname}?${searchParams}`);
+		},
+		[pathname, params, push],
+	);
 
 	const handleLoginLogout = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
@@ -43,7 +86,29 @@ const Aside = memo(({ session }: AsideProps) => {
 				</Link>
 			</header>
 
-			<main className="flex-1 p-4 break-words">categories list</main>
+			<main className="flex-1 p-4 break-words">
+				{isLoading ? (
+					<CategorySkeleton />
+				) : (
+					<>
+						{categories?.map((category) => {
+							return (
+								<div
+									key={category.id}
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+										handleSelectCategory(category.name);
+									}}
+									className="flex items-center font-semibold p-1 rounded-md uppercase text-xs hover:bg-slate-200 cursor-pointer"
+								>
+									<span>{category.name}</span>
+								</div>
+							);
+						})}
+					</>
+				)}
+			</main>
 
 			<footer className="px-4 py-6 border-t">
 				<div className="flex items-center justify-center">

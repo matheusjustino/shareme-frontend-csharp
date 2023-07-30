@@ -1,10 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { NextPage } from 'next';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader, Plus, UserCircle2 } from 'lucide-react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { AxiosRequestConfig } from 'axios';
@@ -21,6 +22,7 @@ import { ListPostItemInterface } from '@/interfaces/list-post-item.interface';
 // COMPONENTS
 import { SearchBar } from '@/components/search-bar';
 import { MasonryLayout } from '@/components/masonry-layout';
+import { HomePagePostsSkeleton } from '@/components/home-page-posts-skeleton';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,31 +30,47 @@ const HomePage: NextPage = () => {
 	const { data: session, status } = useSession();
 	const category = useSearchParams().get('category');
 
-	const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-		useInfiniteQuery(
-			[`infinite-posts-feed`],
-			async ({ pageParam = 0 }) => {
-				const config: AxiosRequestConfig = {
-					params: {
-						skip: pageParam,
-						limit: POSTS_QUERY_SIZE,
-					},
-				};
-				return await api
-					.get<ListPostItemInterface[]>(`/posts`, config)
-					.then((res) => res.data ?? []);
-			},
-			{
-				// staleTime: 60,
-				getNextPageParam: (lastPage, pages) => {
-					if (lastPage?.length < POSTS_QUERY_SIZE) {
-						return false;
-					}
-
-					return pages.length + 1;
+	const queryClient = useQueryClient();
+	const {
+		data,
+		refetch,
+		fetchNextPage,
+		hasNextPage,
+		isFetching,
+		isFetchingNextPage,
+	} = useInfiniteQuery(
+		[`infinite-posts-feed`],
+		async ({ pageParam = 0 }) => {
+			const config: AxiosRequestConfig = {
+				params: {
+					skip: pageParam,
+					limit: POSTS_QUERY_SIZE,
+					...(category?.length && { category }),
 				},
+			};
+			return await api
+				.get<ListPostItemInterface[]>(`/posts`, config)
+				.then((res) => res.data ?? []);
+		},
+		{
+			getNextPageParam: (lastPage, pages) => {
+				if (lastPage?.length < POSTS_QUERY_SIZE) {
+					return false;
+				}
+
+				return pages.length + 1;
 			},
-		);
+		},
+	);
+
+	useEffect(() => {
+		queryClient.setQueryData([`infinite-posts-feed`], (oldData) => {
+			if (!oldData) return oldData;
+
+			return { pages: [] };
+		});
+		refetch();
+	}, [category]);
 
 	const posts = data?.pages.flat() ?? [];
 
@@ -86,12 +104,8 @@ const HomePage: NextPage = () => {
 				</Link>
 			</header>
 
-			{isFetching && (
-				<div className="w-full flex flex-col items-center justify-center mt-8">
-					<Loader className="animate-spin text-blue-500 w-8 h-8 sm:w-10 sm:h-10" />
-					<span className="font-semibold">Loading...</span>
-				</div>
-			)}
+			{isFetching && <HomePagePostsSkeleton />}
+
 			<InfiniteScroll
 				dataLength={posts.length}
 				hasMore={!!hasNextPage}

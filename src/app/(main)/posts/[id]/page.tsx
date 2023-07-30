@@ -41,6 +41,7 @@ const PostDetailsPage: NextPage<PostDetailsProps> = ({ params: { id } }) => {
 		data: post,
 		refetch: getPost,
 		isRefetching,
+		isFetched,
 	} = useQuery({
 		queryKey: [`post-details-${id}`],
 		queryFn: async () => {
@@ -142,7 +143,7 @@ const PostDetailsPage: NextPage<PostDetailsProps> = ({ params: { id } }) => {
 		getPost();
 	}, [id, getPost]);
 
-	if (status === 'loading' || isRefetching) {
+	if (status === 'loading' || !isFetched) {
 		return (
 			<div className="w-full h-full flex flex-col items-center justify-center gap-2">
 				<Loader className="text-blue-500 animate-spin h-12 w-12" />

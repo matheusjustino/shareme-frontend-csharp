@@ -1,1 +1,1 @@
-export const POSTS_QUERY_SIZE = 2;
+export const POSTS_QUERY_SIZE = 10;

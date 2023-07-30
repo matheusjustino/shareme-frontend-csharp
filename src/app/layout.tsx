@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
+import NextTopLoader from 'nextjs-toploader';
 
 // PROVIDERS
 import { AppProvider } from '@/providers/app.provider';
@@ -24,6 +25,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={font.className}>
+				<NextTopLoader color="#dc2626" />
 				<AppProvider pageProps={props}>{children}</AppProvider>
 				<Toaster />
 			</body>

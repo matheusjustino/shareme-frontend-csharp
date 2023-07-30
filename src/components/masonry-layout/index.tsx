@@ -6,7 +6,7 @@ import { ListPostItemInterface } from '@/interfaces/list-post-item.interface';
 // COMPONENTS
 import { PostListItem } from '@/components/post-list-item';
 
-const breakpointColumnsObj = Object.freeze({
+export const breakpointColumnsObj = Object.freeze({
 	default: 4,
 	3000: 6,
 	2000: 5,

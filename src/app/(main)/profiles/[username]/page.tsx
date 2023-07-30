@@ -64,7 +64,7 @@ const ProfilesPage = ({ params: { username } }: ProfilesPageProps) => {
 			<div
 				className={`relative flex flex-col items-center justify-center w-full h-full gap-8 p-2 sm:p-4 z-[1]`}
 			>
-				{userProfile?.profileImg && (
+				{/* {userProfile?.profileImg && (
 					<div className="absolute w-full h-full -z-[1]">
 						<Image
 							className="object-cover"
@@ -74,13 +74,19 @@ const ProfilesPage = ({ params: { username } }: ProfilesPageProps) => {
 							priority
 						/>
 					</div>
-				)}
+				)} */}
 
-				<div
-					className="
-						cursor-pointer p-[1px] rounded-full bg-white border border-white
-						hover:text-emerald-500 transition-colors duration-200"
-				>
+				<div className="absolute w-full h-full -z-[1]">
+					<Image
+						className="object-cover"
+						src="/profile-img.jpg"
+						alt="Profile background image"
+						fill
+						priority
+					/>
+				</div>
+
+				<div className="p-[1px] rounded-full bg-white border border-white">
 					<UserCircle className="w-20 h-20 sm:w-28 sm:h-28" />
 				</div>
 
@@ -98,9 +104,9 @@ const ProfilesPage = ({ params: { username } }: ProfilesPageProps) => {
 								onClick={() => setSelectedTab(tab)}
 								className={`
 									text-center px-3 py-2 rounded-full min-w-[100px] capitalize
-									font-semibold cursor-pointer transition-colors duration-200 dark:text-white ${
+									font-semibold cursor-pointer transition-colors duration-200 text-white ${
 										tab === selectedTab
-											? 'bg-orange-500 text-white'
+											? 'bg-orange-500'
 											: 'border border-orange-500 hover:bg-orange-300'
 									}
 								`}

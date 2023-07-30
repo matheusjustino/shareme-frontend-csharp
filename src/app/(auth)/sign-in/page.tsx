@@ -3,7 +3,7 @@
 import { memo, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { NextPage } from 'next';
-import { redirect, useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { signIn, useSession } from 'next-auth/react';
 import { z } from 'zod';

@@ -82,7 +82,7 @@ const Navbar = memo(({ session }: NavbarProps) => {
 			<div
 				className={`${
 					collapsed ? '-left-[100%]' : 'left-0'
-				} w-full min-h-full h-full z-50 absolute bg-slate-100 transition-all duration-200`}
+				} w-full min-h-full h-full z-[60] absolute bg-slate-100 transition-all duration-200`}
 			>
 				{session?.user ? (
 					<>
